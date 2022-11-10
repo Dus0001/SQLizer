@@ -1,7 +1,7 @@
-const mysql = requiew('mysql2');
+const mysql = require('mysql2');
 
 //connect to database
-const db = mysql.createConnetions(
+const db = mysql.createConnection(
     {
         host: 'localhost',
         user: 'root',
