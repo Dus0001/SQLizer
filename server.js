@@ -20,7 +20,7 @@ const mainMenu = () => {
         } else if(results.action === 'View all Roles'){
             viewAllRoles();
         } else if(results.action === 'View all employees'){
-            viewAllEmployees
+            viewAllEmployees();
         } else if (results.action === 'Add a department'){
             addDepartment();
         } else if(results.action === 'Add a role'){
@@ -44,7 +44,7 @@ viewAllDepartment = () => {
     db.query(sql,(err, row) => {
         if(err){
             console.log(err)
-            return;
+            return mainMenu
         }
         console.table(row);
     });
@@ -56,7 +56,7 @@ viewAllRoles = () => {
    db.query(sql, (err, row) => {
      if(err){
         console.log(err);
-        return
+        return mainMenu
      }
 
      console.table(row)
@@ -64,5 +64,50 @@ viewAllRoles = () => {
    return mainMenu();
 };
 
+viewAllEmployees = () => {
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name, departments.name, role.title AS department FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN departments ON role.department_id = departments.id`
+        db.query(sql, (err, row) => {
+            if(err){
+                console.log(err);
+
+                return mainMenu
+            }
+            console.table(row);
+        });
+        return mainMenu();
+}
+
+addDepartment = () => {
+
+    inquirer.prompt([
+        {
+            type:'input',
+            name: 'name',
+            message:'What would you like to name your new department?',
+            validate: nameInput => {
+                if(!nameInput){
+                    return false;
+                }
+                return true;
+            }
+
+        }
+    ])
+    .then(input => {
+        console.log(input.name);
+        const sql = `INSERT INTO departments (name) VALUES (?)`;
+        const params = input.name;
+        
+        db.query(sql, params, (err,result) => {
+            if(err){
+                console.log(err);
+                return mainMenu();
+            }
+            console.log("Added new department" + result + "!");
+            return mainMenu();
+        })
+    });
+    
+};
 
 mainMenu();
