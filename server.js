@@ -10,7 +10,7 @@ const mainMenu = () => {
         type:'list',
         name:'action',
         message: 'Please choose an action below.',
-        choices: ['View all departments', 'View all Roles','View all employees','Add a department', 'Add a role', 'Add an employee','Update an employee role', "I'm Finished"]
+        choices: ['View all departments', 'View all Roles','View all employees','Add a department', 'Add a role', 'Add an employee','Update an employee role']
         }
     ])
     .then(results => {
@@ -30,8 +30,6 @@ const mainMenu = () => {
             addEmployee();
         } else if (results.action ==='Update an employee role'){
             updateEmployeeRole();
-        } else if(results.action === "I'm finished"){
-            endPrompt();
         };
     });
 
@@ -259,5 +257,8 @@ updateEmployeeRole = () => {
     });
 };
 
+endPrompt = () =>{
+    prompt.complete();
+}
 
 mainMenu();
