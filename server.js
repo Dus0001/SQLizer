@@ -110,4 +110,49 @@ addDepartment = () => {
     
 };
 
+addRole = () => {
+    
+    const sql = `Select name, id FROM departments`
+        db.query(sql, (err,row) => {
+            if(err){
+                console.log(err);
+            }
+
+            const departmentsData = row.map(({name, id}) => (({name:name,value:id})));
+            console.log(departmentsData);
+           
+            inquirer.prompt([
+        
+                {
+                    type: 'input',
+                    name: 'title',
+                    message:'Please enter the name of the role',
+                },
+                {
+                    type:'input',
+                    name:'salary',
+                    message:"Please enter the role's salary",
+                },
+                {
+                    type:'list',
+                    name: 'department',
+                    message: 'Which department does this role belong to?',
+                    choices: departmentsData,
+                }
+            ])
+            .then(newRole => {
+                const sql = 'INSERT INTO role (title, salary, department_id) VALUES (?,?,?)';
+                const params = [newRole.title, newRole.salary, newRole.department];
+                db.query(sql,params, (err, results) => {
+                    if(err){
+                       return console.log(err);
+                    }
+                    console.log('Added '+ newRole.title + ' to roles!') 
+                    return mainMenu();
+                });
+            });
+        })
+    
+};
+
 mainMenu();
