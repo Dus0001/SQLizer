@@ -204,11 +204,60 @@ addEmployee = () => {
                 }
                 console.log('Added ' + newEmployee.first_name + ' to employee!');
                 return mainMenu();
-            })
+            });
 
-        })
-    })
-}
+        });
+    });
+};
+
+updateEmployeeRole = () => {
+    const sql = `SELECT * FROM employee`;
+    const params = [];
+    db.query(sql,(err, data) =>{
+        if(err){
+            console.log(err);
+        }
+        const employees = data.map(({id, first_name, last_name}) => ({name: first_name + ' ' + last_name, value: id}));
+        inquirer.prompt([
+            {
+                type:'list',
+                name:'employee',
+                message: 'Who do you wish to update?',
+                choices: employees,
+            }
+        ])
+        .then(employeeSelected => {
+            const employeeID = employeeSelected.employee;
+            console.log(employeeSelected);
+            params.push(employeeID);
+            const sql = `SELECT * FROM role`;
+            db.query(sql, (err, data) =>{
+                if(err){
+                    console.log(err);
+                }
+                const roles = data.map(({id, title}) => ({name:title, value:id}));
+                inquirer.prompt({
+                    type:'list',
+                    name:'role',
+                    message:'Please select a new role.',
+                    choices: roles,
+                })
+                .then(roleSelected =>{
+                    const newRole = roleSelected.role;
+                    params.push(newRole);
+                    const sql =`UPDATE employee SET role_id = ? Where id = ?`
+                    db.query(sql,params.reverse(), (err, data) => {
+                        if(err){
+                            console.log(err);
+                        }
+                        console.log('Updated '  + employeeSelected.name + ' role!');
+                        return mainMenu();
+                    });
+                });
+            });
+        });
+    });
+};
 
 
 mainMenu();
