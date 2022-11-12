@@ -2,6 +2,7 @@ const { Console } = require('console');
 const express = require('express');
 const inquirer = require('inquirer');
 const db = require('./db/connections')
+
 //Create prompts for main menu
 const mainMenu = () => {
     inquirer.prompt([
@@ -154,5 +155,60 @@ addRole = () => {
         })
     
 };
+
+addEmployee = () => {
+    const sql = `SELECT role.id, role.title FROM role`;
+    db.query(sql,(err, result) =>{
+        if(err){
+            return console.log(err);
+        }
+        const roleChoices = result.map(({id,title}) => ({name:title, value:id}));
+        inquirer.prompt([
+            {
+                type:'input',
+                name:'first_name',
+                message: 'Please enter the employee first name.',
+                validate: firstNameInput => {
+                    if (!firstNameInput){
+                        console.log('Please enter a first name!')
+                        return false;
+                    }
+                    return true;
+                }
+            },
+            {
+                type: 'input',
+                name: 'last_name',
+                message: 'Please enter the employee last name.',
+                vazlidate: lastNameInput => {
+                    if (!lastNameInput){
+                        console.log('Please enter a last name!');
+                        return false;
+                    }
+                    return true;
+                }
+            },
+            {
+                type:'list',
+                name: 'role',
+                message: "What is the employee's role?",
+                choices: roleChoices,
+            },
+        ])
+        .then(newEmployee => {
+            const sql = `INSERT INTO employee (first_name, last_name, role_id) VALUES (?,?,?)`;
+            const params = [newEmployee.first_name, newEmployee.last_name, newEmployee.role];
+            db.query(sql, params, (err, data) =>{
+                if(err){
+                    return console.log(err);
+                }
+                console.log('Added ' + newEmployee.first_name + ' to employee!');
+                return mainMenu();
+            })
+
+        })
+    })
+}
+
 
 mainMenu();
