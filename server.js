@@ -38,42 +38,45 @@ const mainMenu = () => {
 
 viewAllDepartment = () => {
 
-    const sql = `SELECT departments.id, departments.name AS departments FROM departments`;
+    const sql = `SELECT department.id, department.name AS departments FROM department`;
 
     db.query(sql,(err, row) => {
         if(err){
             console.log(err)
-            return mainMenu
-        }
+            return mainMenu();
+        };
         console.table(row);
+        return mainMenu();
     });
-  return mainMenu()
+  
 };
 
 viewAllRoles = () => {
-    const sql = `SELECT role.id, role.title, role.salary, departments.name AS department FROM role LEFT JOIN departments ON role.department_id = departments.id`;
+    const sql = `SELECT role.id, role.title, role.salary, department.name AS department FROM role LEFT JOIN department ON role.department_id = department.id`;
    db.query(sql, (err, row) => {
      if(err){
         console.log(err);
         return mainMenu
-     }
+     };
 
-     console.table(row)
+     console.table(row);
+     return mainMenu();
    });
-   return mainMenu();
+   
 };
 
 viewAllEmployees = () => {
-    const sql = `SELECT employee.id, employee.first_name, employee.last_name, departments.name, role.title AS department FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN departments ON role.department_id = departments.id`
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name, department.name, role.title AS department FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id`
         db.query(sql, (err, row) => {
             if(err){
                 console.log(err);
 
                 return mainMenu
-            }
+            };
             console.table(row);
+            return mainMenu();
         });
-        return mainMenu();
+       
 }
 
 addDepartment = () => {
@@ -93,8 +96,7 @@ addDepartment = () => {
         }
     ])
     .then(input => {
-        console.log(input.name);
-        const sql = `INSERT INTO departments (name) VALUES (?)`;
+        const sql = `INSERT INTO department (name) VALUES (?)`;
         const params = input.name;
         
         db.query(sql, params, (err,result) => {
@@ -102,7 +104,7 @@ addDepartment = () => {
                 console.log(err);
                 return mainMenu();
             }
-            console.log("Added new department" + result + "!");
+            console.log("Added new department" + input.name + "!");
             return mainMenu();
         })
     });
@@ -111,14 +113,13 @@ addDepartment = () => {
 
 addRole = () => {
     
-    const sql = `Select name, id FROM departments`
+    const sql = `Select name, id FROM department`
         db.query(sql, (err,row) => {
             if(err){
                 console.log(err);
             }
 
             const departmentsData = row.map(({name, id}) => (({name:name,value:id})));
-            console.log(departmentsData);
            
             inquirer.prompt([
         
@@ -256,9 +257,5 @@ updateEmployeeRole = () => {
         });
     });
 };
-
-endPrompt = () =>{
-    prompt.complete();
-}
 
 mainMenu();

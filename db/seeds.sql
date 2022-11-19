@@ -1,4 +1,4 @@
-INSERT INTO departments (id, name) VALUES 
+INSERT INTO department (id, name) VALUES 
 (1,'Qaulity Assurance'),
 (2, 'GMP'),
 (3,'Qaulity Control'),
